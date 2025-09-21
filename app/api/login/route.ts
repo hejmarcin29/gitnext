@@ -2,26 +2,39 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import bcrypt from "bcryptjs";
+import { rateLimit } from "@/lib/rate-limit";
+import { ApiError, handleApiError, loginSchema } from "@/lib/validation";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
-    if (typeof email !== "string" || typeof password !== "string") {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    // Rate limiting
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    if (rateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429 }
+      );
     }
+
+    // Walidacja payloadu
+    const body = await req.json();
+    const { email, password } = loginSchema.parse(body);
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.isActive) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      throw new ApiError(401, "Invalid credentials");
     }
+
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    if (!ok) {
+      throw new ApiError(401, "Invalid credentials");
+    }
 
     await createSession(user.id);
 
     const to = user.role === "ADMIN" ? "/panel-admin" : "/panel-montazysty";
     return NextResponse.json({ ok: true, to });
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error);
   }
 }

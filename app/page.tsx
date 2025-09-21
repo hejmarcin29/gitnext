@@ -1,11 +1,15 @@
-// app/page.tsx
+import { currentUser } from "@/lib/currentUser";
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/session";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const s = await getSession();
-  if (!s) redirect("/login");
-  redirect(s.user.role === "ADMIN" ? "/panel-admin" : "/panel-montazysty");
+  const user = await currentUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
+
+  redirect(user.role === "ADMIN" ? "/panel-admin" : "/panel-montazysty");
 }

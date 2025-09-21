@@ -20,6 +20,7 @@ model User {
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   sessions     Session[]
+  montaze      Montaz[]  // montaże przypisane do montażysty
 }
 
 model Session {
@@ -32,4 +33,25 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+enum MontazStatus {
+  NOWY
+  W_TRAKCIE
+  ZAKONCZONY
+}
+
+model Montaz {
+  id              Int          @id @default(autoincrement())
+  klientImie      String
+  klientNazwisko  String
+  status          MontazStatus @default(NOWY)
+  uwagi           String?      // opcjonalne uwagi
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  montazystaId    Int
+  montazysta      User         @relation(fields: [montazystaId], references: [id])
+
+  @@index([montazystaId])
+  @@index([status])
 }

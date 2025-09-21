@@ -1,0 +1,14 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# TypeScript and JavaScript files should use LF
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+
+# JSON files should use LF
+*.json text eol=lf
+
+# Markdown files should use LF
+*.md text eol=lf
