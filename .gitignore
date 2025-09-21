@@ -4,6 +4,8 @@
 /node_modules
 /.pnp
 .pnp.*
+
+# yarn berry (harmless if unused)
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -22,6 +24,7 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -30,8 +33,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env
+.env.local
+.env.*.local
 
 # vercel
 .vercel
@@ -39,3 +44,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# editors
+.vscode/**/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# prisma/sqlite (local DB — do not commit)
+data/
+*.db*
+*.sqlite
+
+# generated prisma (only if you actually generate here)
+# /lib/generated/prisma
