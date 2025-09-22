@@ -14,13 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import type { Montaz, User } from '@prisma/client';
 
 type MontazWithMontazysta = Montaz & {
-  montazysta: User;
+  montazysta: Pick<User, 'id' | 'email'>;
 };
 
 interface MontazTableProps {
   montaze: MontazWithMontazysta[];
   onEdit: (montaz: MontazWithMontazysta) => void;
   onDelete: (montaz: MontazWithMontazysta) => void;
+  onEditPomiary?: (montaz: MontazWithMontazysta) => void; // callback dla admina
+  onClientClick?: (montaz: MontazWithMontazysta) => void; // callback dla kliknięcia w klienta
 }
 
 const statusVariant = {
@@ -29,7 +31,7 @@ const statusVariant = {
   ZAKONCZONY: 'outline',
 } as const;
 
-export function MontazTable({ montaze, onEdit, onDelete }: MontazTableProps) {
+export function MontazTable({ montaze, onEdit, onDelete, onEditPomiary, onClientClick }: MontazTableProps) {
   return (
     <>
       {/* Mobile Card Layout */}
@@ -38,7 +40,10 @@ export function MontazTable({ montaze, onEdit, onDelete }: MontazTableProps) {
           <div key={montaz.id} className="border rounded-lg p-4 space-y-3 bg-card">
             <div className="space-y-2">
               <div className="flex items-start justify-between">
-                <h3 className="font-medium text-sm">
+                <h3 
+                  className={`font-medium text-sm ${onClientClick ? "cursor-pointer hover:text-primary" : ""}`}
+                  onClick={() => onClientClick?.(montaz)}
+                >
                   {montaz.klientImie} {montaz.klientNazwisko}
                 </h3>
                 <Badge variant={statusVariant[montaz.status]} className="text-xs">
@@ -95,7 +100,12 @@ export function MontazTable({ montaze, onEdit, onDelete }: MontazTableProps) {
           <TableBody>
             {montaze.map((montaz) => (
               <TableRow key={montaz.id}>
-                <TableCell>{montaz.klientImie} {montaz.klientNazwisko}</TableCell>
+                <TableCell 
+                  className={onClientClick ? "cursor-pointer hover:bg-muted/50" : ""}
+                  onClick={() => onClientClick?.(montaz)}
+                >
+                  {montaz.klientImie} {montaz.klientNazwisko}
+                </TableCell>
                 <TableCell>
                   <Badge variant={statusVariant[montaz.status]}>
                     {montaz.status.replace('_', ' ')}

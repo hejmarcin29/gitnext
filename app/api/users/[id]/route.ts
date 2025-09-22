@@ -11,15 +11,16 @@ const updateUserSchema = z.object({
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: idString } = await params;
     const user = await currentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const id = parseInt(params.id);
+    const id = parseInt(idString);
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
@@ -58,18 +59,20 @@ export async function PUT(
       );
     }
 
-    if (error?.code === "P2002") {
-      return NextResponse.json(
-        { error: "Email already exists" },
-        { status: 400 }
-      );
-    }
+    if (error && typeof error === 'object' && 'code' in error) {
+      if (error.code === "P2002") {
+        return NextResponse.json(
+          { error: "Email already exists" },
+          { status: 400 }
+        );
+      }
 
-    if (error?.code === "P2025") {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      if (error.code === "P2025") {
+        return NextResponse.json(
+          { error: "User not found" },
+          { status: 404 }
+        );
+      }
     }
 
     console.error("[PUT] /api/users/[id] error:", error);
@@ -83,15 +86,16 @@ export async function PUT(
 // Endpoint do przełączania statusu aktywności
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: idString } = await params;
     const user = await currentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const id = parseInt(params.id);
+    const id = parseInt(idString);
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }

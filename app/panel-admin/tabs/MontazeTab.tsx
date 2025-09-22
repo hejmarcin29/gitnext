@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { MontazTable } from '@/components/montaze/MontazTable';
 import { AddMontazDialog } from '@/components/montaze/AddMontazDialog';
 import { EditMontazDialog } from '@/components/montaze/EditMontazDialog';
+import { AdminEditPomiarDialog } from '@/components/pomiary/AdminEditPomiarDialog';
+import { ClientSummaryDialog } from '@/components/montaze/ClientSummaryDialog';
 import type { Montaz, User } from '@prisma/client';
-import { toast } from 'sonner';
 
 type MontazWithMontazysta = Montaz & {
   montazysta: Pick<User, 'id' | 'email'>;
 };
+import { toast } from 'sonner';
 
 export function MontazeTab() {
   const router = useRouter();
@@ -18,6 +20,10 @@ export function MontazeTab() {
   const [montazysci, setMontazysci] = useState<User[]>([]);
   const [editingMontaz, setEditingMontaz] = useState<MontazWithMontazysta | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingPomiary, setEditingPomiary] = useState<MontazWithMontazysta | null>(null);
+  const [isPomiaryDialogOpen, setIsPomiaryDialogOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<MontazWithMontazysta | null>(null);
+  const [isClientSummaryOpen, setIsClientSummaryOpen] = useState(false);
 
   // Pobierz montaże i montażystów przy pierwszym renderowaniu
   useEffect(() => {
@@ -49,6 +55,16 @@ export function MontazeTab() {
   const handleEdit = (montaz: MontazWithMontazysta) => {
     setEditingMontaz(montaz);
     setIsEditDialogOpen(true);
+  };
+
+  const handleEditPomiary = (montaz: MontazWithMontazysta) => {
+    setEditingPomiary(montaz);
+    setIsPomiaryDialogOpen(true);
+  };
+
+  const handleClientClick = (montaz: MontazWithMontazysta) => {
+    setSelectedClient(montaz);
+    setIsClientSummaryOpen(true);
   };
 
   const handleDelete = async (montaz: MontazWithMontazysta) => {
@@ -83,6 +99,8 @@ export function MontazeTab() {
         montaze={montaze}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onEditPomiary={handleEditPomiary}
+        onClientClick={handleClientClick}
       />
 
       {editingMontaz && (
@@ -92,6 +110,24 @@ export function MontazeTab() {
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           onMontazUpdated={handleMontazAdded}
+        />
+      )}
+
+      {editingPomiary && (
+        <AdminEditPomiarDialog
+          montaz={editingPomiary}
+          open={isPomiaryDialogOpen}
+          onOpenChange={setIsPomiaryDialogOpen}
+          onMontazUpdated={handleMontazAdded}
+        />
+      )}
+
+      {selectedClient && (
+        <ClientSummaryDialog
+          open={isClientSummaryOpen}
+          onOpenChange={setIsClientSummaryOpen}
+          montaz={selectedClient as any} // Cast because of extended interface
+          onUpdate={handleMontazAdded}
         />
       )}
     </div>

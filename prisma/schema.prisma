@@ -67,6 +67,7 @@ model Montaz {
   // Pola do śledzenia zmian
   czyZmianaAdresu      Boolean?     // czy montażysta zmienił adres
   czyZmianaModelu      Boolean?     // czy montażysta zmienił model panela
+  modelPanela          String?      // oryginalny model panela (ustawiany przez admina)
   nowyModelPanela      String?      // nowy model panela (jeśli zmieniony)
   historiaZmianModelu  String?      // historia zmian modelu (JSON lub tekst)
   notatkiMontazysty    String?      // notatki montażysty (były "uwagi")

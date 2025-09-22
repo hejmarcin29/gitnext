@@ -8,14 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import type { Montaz, User } from '@prisma/client';
-
-type MontazWithMontazysta = Montaz & {
-  montazysta: User;
-};
+import type { User } from '@prisma/client';
+import type { MontazWithMontazystaBasic } from '@/types/montaz';
 
 interface EditMontazDialogProps {
-  montaz: MontazWithMontazysta;
+  montaz: MontazWithMontazystaBasic;
   montazysci: User[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -48,6 +45,15 @@ export function EditMontazDialog({
       montazystaId: Number(formData.get('montazystaId')),
       status: formData.get('status'),
       uwagi: formData.get('uwagi') || undefined,
+      notatkiMontazysty: formData.get('notatkiMontazysty') || undefined,
+      modelPanela: formData.get('modelPanela') || undefined,
+      // Dodatkowe pola
+      terminMontazu: formData.get('terminMontazu') || undefined,
+      terminDostawy: formData.get('terminDostawy') || undefined,
+      dniPrzedMontazem: formData.get('dniPrzedMontazem') ? Number(formData.get('dniPrzedMontazem')) : undefined,
+      warunekWnoszenia: formData.get('warunekWnoszenia') || undefined,
+      pomiarM2: formData.get('pomiarM2') ? Number(formData.get('pomiarM2')) : undefined,
+      procentDocinki: formData.get('procentDocinki') ? Number(formData.get('procentDocinki')) : undefined,
     };
 
     try {
@@ -130,12 +136,98 @@ export function EditMontazDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="uwagi" className="text-sm font-medium">Uwagi (opcjonalne)</Label>
+            <Label htmlFor="notatkiMontazysty" className="text-sm font-medium">Notatki montażysty (opcjonalne)</Label>
             <Textarea 
-              id="uwagi" 
-              name="uwagi"
-              defaultValue={montaz.uwagi || ''}
+              id="notatkiMontazysty" 
+              name="notatkiMontazysty"
+              defaultValue={(montaz as any)?.notatkiMontazysty || montaz.uwagi || ''}
               className="min-h-[80px] resize-none"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="modelPanela" className="text-sm font-medium">Model panela (opcjonalne)</Label>
+            <Input 
+              id="modelPanela" 
+              name="modelPanela"
+              defaultValue={montaz.modelPanela || ''}
+              placeholder="np. Growatt 480W"
+              className="h-11 sm:h-10"
+            />
+          </div>
+          
+          {/* Sekcja terminów */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="terminMontazu" className="text-sm font-medium">Termin montażu</Label>
+              <Input 
+                type="date"
+                id="terminMontazu" 
+                name="terminMontazu"
+                defaultValue={montaz.terminMontazu ? new Date(montaz.terminMontazu).toISOString().split('T')[0] : ''}
+                className="h-11 sm:h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="terminDostawy" className="text-sm font-medium">Termin dostawy</Label>
+              <Input 
+                type="date"
+                id="terminDostawy" 
+                name="terminDostawy"
+                defaultValue={montaz.terminDostawy ? new Date(montaz.terminDostawy).toISOString().split('T')[0] : ''}
+                className="h-11 sm:h-10"
+              />
+            </div>
+          </div>
+          
+          {/* Sekcja pomiarów */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="pomiarM2" className="text-sm font-medium">Pomiar (m²)</Label>
+              <Input 
+                type="number"
+                step="0.01"
+                id="pomiarM2" 
+                name="pomiarM2"
+                defaultValue={montaz.pomiarM2 || ''}
+                placeholder="0.00"
+                className="h-11 sm:h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="procentDocinki" className="text-sm font-medium">% docinki</Label>
+              <Input 
+                type="number"
+                min="5"
+                max="20"
+                id="procentDocinki" 
+                name="procentDocinki"
+                defaultValue={montaz.procentDocinki || ''}
+                placeholder="10"
+                className="h-11 sm:h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dniPrzedMontazem" className="text-sm font-medium">Dni przed montażem</Label>
+              <Input 
+                type="number"
+                min="1"
+                id="dniPrzedMontazem" 
+                name="dniPrzedMontazem"
+                defaultValue={montaz.dniPrzedMontazem || ''}
+                placeholder="3"
+                className="h-11 sm:h-10"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="warunekWnoszenia" className="text-sm font-medium">Warunki wnoszenia (opcjonalne)</Label>
+            <Input 
+              id="warunekWnoszenia" 
+              name="warunekWnoszenia"
+              defaultValue={montaz.warunekWnoszenia || ''}
+              placeholder="np. 2 piętro, brak windy"
+              className="h-11 sm:h-10"
             />
           </div>
           <Button 

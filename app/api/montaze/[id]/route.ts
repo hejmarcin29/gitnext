@@ -23,6 +23,7 @@ const updateMontazSchema = z.object({
   // Pola do śledzenia zmian
   czyZmianaAdresu: z.boolean().optional(),
   czyZmianaModelu: z.boolean().optional(),
+  modelPanela: z.string().optional(),
   nowyModelPanela: z.string().optional(),
   historiaZmianModelu: z.string().optional(),
   notatkiMontazysty: z.string().optional(),
@@ -70,7 +71,14 @@ export async function PUT(
     // Dodaj tylko pola które mają wartości (nie są undefined)
     if (validated.klientImie !== undefined) updateData.klientImie = validated.klientImie;
     if (validated.klientNazwisko !== undefined) updateData.klientNazwisko = validated.klientNazwisko;
-    if (validated.uwagi !== undefined) updateData.uwagi = validated.uwagi;
+    if (validated.uwagi !== undefined) {
+      updateData.uwagi = validated.uwagi;
+      updateData.notatkiMontazysty = validated.uwagi; // backup copy
+    }
+    if (validated.notatkiMontazysty !== undefined) {
+      updateData.notatkiMontazysty = validated.notatkiMontazysty;
+      updateData.uwagi = validated.notatkiMontazysty; // backward compatibility
+    }
     if (validated.czyKlientPotwierdza !== undefined) updateData.czyKlientPotwierdza = validated.czyKlientPotwierdza;
     if (validated.czyZmiana !== undefined) updateData.czyZmiana = validated.czyZmiana;
     if (validated.adres !== undefined) updateData.adres = validated.adres;

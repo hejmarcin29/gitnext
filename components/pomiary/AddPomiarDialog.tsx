@@ -189,7 +189,7 @@ export function AddPomiarDialog({ onPomiarAdded, montaz }: AddPomiarDialogProps)
                 <Input 
                   id="modelPanela" 
                   name={innyModel ? "nowyModelPanela" : "modelPanela"}
-                  defaultValue={innyModel ? "" : ((montaz as any)?.montazysta?.modelPanela || "Brak danych")}
+                  defaultValue={innyModel ? "" : ((montaz as any)?.modelPanela || "Brak danych")}
                   readOnly={!innyModel}
                   className={`h-11 sm:h-10 ${!innyModel ? 'bg-muted' : ''}`}
                   placeholder={innyModel ? "Wprowadź nowy model panela" : "Brak danych"}

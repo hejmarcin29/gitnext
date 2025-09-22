@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserTable } from '@/components/users/UserTable';
 import { AddUserDialog } from '@/components/users/AddUserDialog';
@@ -14,7 +14,7 @@ export function UsersTab() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Pobierz użytkowników przy pierwszym renderowaniu
-  useState(() => {
+  useEffect(() => {
     fetch('/api/users')
       .then((res) => res.json())
       .then(setUsers)
