@@ -2,14 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { currentUser } from "@/lib/currentUser";
-
-// Walidacja payloadu
-const createMontazSchema = z.object({
-  klientImie: z.string().min(1),
-  klientNazwisko: z.string().min(1),
-  montazystaId: z.number(),
-  uwagi: z.string().optional(),
-});
+import { createPomiarSchema } from "@/lib/validation";
 
 export async function GET() {
   try {
@@ -26,6 +19,7 @@ export async function GET() {
           select: {
             id: true,
             email: true,
+            modelPanela: true,
           },
         },
       },
@@ -45,18 +39,34 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const user = await currentUser();
-    if (!user || user.role !== "ADMIN") {
+    
+    // Dla pomiarów - montażysta może dodawać własne
+    // Dla montaży (przez admina) - tylko admin
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const validated = createMontazSchema.parse(body);
+    const validated = createPomiarSchema.parse(body);
+
+    // Jeśli montażysta dodaje pomiar - automatycznie przypisz do siebie
+    const montazystaId = user.role === "MONTAZYSTA" ? user.id : validated.montazystaId;
 
     const newMontaz = await prisma.montaz.create({
       data: {
         klientImie: validated.klientImie,
         klientNazwisko: validated.klientNazwisko,
-        montazystaId: validated.montazystaId,
+        montazystaId: montazystaId,
+        czyKlientPotwierdza: validated.czyKlientPotwierdza,
+        czyZmiana: validated.czyZmiana,
+        adres: validated.adres,
+        notatkaPrimepodloga: validated.notatkaPrimepodloga,
+        pomiarM2: validated.pomiarM2,
+        procentDocinki: validated.procentDocinki,
+        terminMontazu: validated.terminMontazu,
+        terminDostawy: validated.terminDostawy,
+        dniPrzedMontazem: validated.dniPrzedMontazem,
+        warunekWnoszenia: validated.warunekWnoszenia,
         uwagi: validated.uwagi,
       },
       include: {

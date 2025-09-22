@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { currentUser } from "@/lib/currentUser";
-
-// Walidacja payloadu
-const createUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  role: z.enum(["ADMIN", "MONTAZYSTA"]),
-});
+import { createUserSchema } from "@/lib/validation";
 
 export async function GET() {
   try {
@@ -52,20 +45,28 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validated = createUserSchema.parse(body);
 
-    // Hash hasła
-    const passwordHash = await bcrypt.hash(validated.password, 10);
+    // Zwykłe hasło bez hasha
+    const passwordHash = validated.password;
 
     const newUser = await prisma.user.create({
       data: {
         email: validated.email,
         passwordHash,
         role: validated.role,
+        telefon: validated.telefon,
+        adres: validated.adres,
+        modelPanela: validated.modelPanela,
+        notatka: validated.notatka,
       },
       select: {
         id: true,
         email: true,
         role: true,
         isActive: true,
+        telefon: true,
+        adres: true,
+        modelPanela: true,
+        notatka: true,
       },
     });
 
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
     }
 
     // Obsługa duplikatu email
-    if (error?.code === "P2002") {
+    if ((error as any)?.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
         { status: 400 }

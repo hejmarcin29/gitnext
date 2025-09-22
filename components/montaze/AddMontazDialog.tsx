@@ -56,23 +56,37 @@ export function AddMontazDialog({ montazysci, onMontazAdded }: AddMontazDialogPr
       <DialogTrigger asChild>
         <Button>Dodaj montaż</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[95vw] max-w-[500px] sm:w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Dodaj nowy montaż</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Dodaj nowy montaż</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="klientImie">Imię klienta</Label>
-            <Input required id="klientImie" name="klientImie" />
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="klientImie" className="text-sm font-medium">Imię klienta</Label>
+              <Input 
+                required 
+                id="klientImie" 
+                name="klientImie" 
+                className="h-11 sm:h-10"
+                placeholder="Jan"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="klientNazwisko" className="text-sm font-medium">Nazwisko klienta</Label>
+              <Input 
+                required 
+                id="klientNazwisko" 
+                name="klientNazwisko" 
+                className="h-11 sm:h-10"
+                placeholder="Kowalski"
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="klientNazwisko">Nazwisko klienta</Label>
-            <Input required id="klientNazwisko" name="klientNazwisko" />
-          </div>
-          <div>
-            <Label htmlFor="montazystaId">Montażysta</Label>
+          <div className="space-y-2">
+            <Label htmlFor="montazystaId" className="text-sm font-medium">Montażysta</Label>
             <Select name="montazystaId" required>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-10">
                 <SelectValue placeholder="Wybierz montażystę" />
               </SelectTrigger>
               <SelectContent>
@@ -84,11 +98,20 @@ export function AddMontazDialog({ montazysci, onMontazAdded }: AddMontazDialogPr
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label htmlFor="uwagi">Uwagi (opcjonalne)</Label>
-            <Textarea id="uwagi" name="uwagi" />
+          <div className="space-y-2">
+            <Label htmlFor="uwagi" className="text-sm font-medium">Uwagi (opcjonalne)</Label>
+            <Textarea 
+              id="uwagi" 
+              name="uwagi" 
+              className="min-h-[80px] resize-none"
+              placeholder="Dodatkowe informacje o montażu..."
+            />
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full h-11 sm:h-10"
+          >
             {loading ? 'Dodawanie...' : 'Dodaj montaż'}
           </Button>
         </form>

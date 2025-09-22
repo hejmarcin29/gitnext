@@ -18,6 +18,10 @@ model User {
   passwordHash String
   role         Role      @default(MONTAZYSTA)
   isActive     Boolean   @default(true)
+  telefon      String?   // numer telefonu klienta
+  adres        String?   // adres klienta
+  modelPanela  String?   // model panela (może być wpisany przez admina)
+  notatka      String?   // notatka od Primepodloga
   createdAt    DateTime  @default(now())
   sessions     Session[]
   montaze      Montaz[]  // montaże przypisane do montażysty
@@ -42,15 +46,39 @@ enum MontazStatus {
 }
 
 model Montaz {
-  id              Int          @id @default(autoincrement())
-  klientImie      String
-  klientNazwisko  String
-  status          MontazStatus @default(NOWY)
-  uwagi           String?      // opcjonalne uwagi
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  montazystaId    Int
-  montazysta      User         @relation(fields: [montazystaId], references: [id])
+  id                    Int          @id @default(autoincrement())
+  klientImie            String
+  klientNazwisko        String
+  status                MontazStatus @default(NOWY)
+  uwagi                 String?      // opcjonalne uwagi (DEPRECATED - używaj notatkiMontazysty)
+  
+  // Nowe pola dla pomiarów
+  czyKlientPotwierdza   Boolean?     // czy klient potwierdza
+  czyZmiana            Boolean?     // czy zmiana (względem pierwotnego modelu)
+  adres                String?      // adres montażu
+  notatkaPrimepodloga  String?      // notatka od Primepodloga (single line)
+  pomiarM2             Float?       // pomiar w metrach kwadratowych
+  procentDocinki       Int?         // procent na docinki (5-20%)
+  terminMontazu        DateTime?    // termin montażu
+  terminDostawy        DateTime?    // termin dostawy towaru
+  dniPrzedMontazem     Int?         // ile dni przed montażem (alternatywa dla terminDostawy)
+  warunekWnoszenia     String?      // warunki wnoszenia (dalej niż podjazd/winda/piętro)
+  
+  // Pola do śledzenia zmian
+  czyZmianaAdresu      Boolean?     // czy montażysta zmienił adres
+  czyZmianaModelu      Boolean?     // czy montażysta zmienił model panela
+  nowyModelPanela      String?      // nowy model panela (jeśli zmieniony)
+  historiaZmianModelu  String?      // historia zmian modelu (JSON lub tekst)
+  notatkiMontazysty    String?      // notatki montażysty (były "uwagi")
+  
+  // Pola potwierdzenia
+  potwierdzaAdres      Boolean?     // czy klient potwierdza adres
+  potwierdzaPanel      Boolean?     // czy klient potwierdza model panela
+  
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  montazystaId         Int
+  montazysta           User         @relation(fields: [montazystaId], references: [id])
 
   @@index([montazystaId])
   @@index([status])

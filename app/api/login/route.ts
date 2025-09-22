@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
-import bcrypt from "bcryptjs";
 import { rateLimit } from "@/lib/rate-limit";
 import { ApiError, handleApiError, loginSchema } from "@/lib/validation";
 
@@ -25,8 +24,8 @@ export async function POST(req: Request) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) {
+    // Zwykłe porównanie haseł bez bcrypt
+    if (password !== user.passwordHash) {
       throw new ApiError(401, "Invalid credentials");
     }
 

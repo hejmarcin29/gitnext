@@ -1,23 +1,27 @@
-import { LogoutButton } from "@/components/LogoutButton";
 import { requireAdmin } from "@/lib/guards";
+import { getSession } from "@/lib/session";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MobileNavigation } from "@/components/ui/mobile-navigation";
 import { UsersTab } from "./tabs/UsersTab";
 import { MontazeTab } from "./tabs/MontazeTab";
 
 export default async function Page() {
   await requireAdmin();
+  const session = await getSession();
   
   return (
-    <main className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Panel administratora</h1>
-        <LogoutButton />
+    <main className="p-4 sm:p-6">
+      {/* Header with responsive navigation */}
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Panel administratora</h1>
+        <MobileNavigation role="ADMIN" userEmail={session?.user.email || ""} />
       </div>
 
+      {/* Responsive tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="users">Użytkownicy</TabsTrigger>
-          <TabsTrigger value="montaze">Montaże</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-none">
+          <TabsTrigger value="users" className="text-sm">Użytkownicy</TabsTrigger>
+          <TabsTrigger value="montaze" className="text-sm">Montaże</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">

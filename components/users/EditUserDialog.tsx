@@ -52,34 +52,36 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="w-[95vw] max-w-[425px] sm:w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edytuj użytkownika</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Edytuj użytkownika</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
             <Input 
               required 
               id="email" 
               name="email" 
               type="email"
               defaultValue={user.email}
+              className="h-11 sm:h-10"
             />
           </div>
-          <div>
-            <Label htmlFor="password">Nowe hasło (opcjonalne)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium">Nowe hasło (opcjonalne)</Label>
             <Input 
               id="password" 
               name="password" 
               type="password"
               placeholder="Pozostaw puste aby nie zmieniać"
+              className="h-11 sm:h-10"
             />
           </div>
-          <div>
-            <Label htmlFor="role">Rola</Label>
+          <div className="space-y-2">
+            <Label htmlFor="role" className="text-sm font-medium">Rola</Label>
             <Select name="role" defaultValue={user.role}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -88,7 +90,11 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full h-11 sm:h-10"
+          >
             {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
           </Button>
         </form>

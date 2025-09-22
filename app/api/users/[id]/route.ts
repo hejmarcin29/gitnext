@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { currentUser } from "@/lib/currentUser";
 
@@ -36,7 +35,7 @@ export async function PUT(
 
     // Jeśli podano hasło, zahaszuj je
     if (validated.password) {
-      updateData.passwordHash = await bcrypt.hash(validated.password, 10);
+      updateData.passwordHash = validated.password; // Zwykłe hasło bez hasha
     }
 
     const updatedUser = await prisma.user.update({

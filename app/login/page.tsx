@@ -33,12 +33,36 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-dvh grid place-items-center p-6">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-3">
-        <h1 className="text-2xl font-semibold text-center">Logowanie</h1>
-        <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input type="password" placeholder="Hasło" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <Button disabled={loading} className="w-full">{loading ? "..." : "Zaloguj"}</Button>
+    <main className="min-h-dvh grid place-items-center p-4 sm:p-6 bg-background">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 sm:space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-xl sm:text-2xl font-semibold">Logowanie</h1>
+          <p className="text-sm text-muted-foreground">Zaloguj się do systemu B2B</p>
+        </div>
+        <div className="space-y-4">
+          <Input 
+            type="email" 
+            placeholder="Email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+            className="h-11 sm:h-10"
+          />
+          <Input 
+            type="password" 
+            placeholder="Hasło" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            className="h-11 sm:h-10"
+          />
+        </div>
+        <Button 
+          disabled={loading} 
+          className="w-full h-11 sm:h-10 text-base sm:text-sm font-medium"
+        >
+          {loading ? "Logowanie..." : "Zaloguj się"}
+        </Button>
       </form>
     </main>
   );

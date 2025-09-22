@@ -6,9 +6,29 @@ import { currentUser } from "@/lib/currentUser";
 const updateMontazSchema = z.object({
   klientImie: z.string().min(1),
   klientNazwisko: z.string().min(1),
-  montazystaId: z.number(),
-  status: z.enum(["NOWY", "W_TRAKCIE", "ZAKONCZONY"]),
+  montazystaId: z.number().optional(),
+  status: z.enum(["NOWY", "W_TRAKCIE", "ZAKONCZONY"]).optional(),
   uwagi: z.string().optional(),
+  // Nowe pola dla pomiarów
+  czyKlientPotwierdza: z.boolean().optional(),
+  czyZmiana: z.boolean().optional(),
+  adres: z.string().optional(),
+  notatkaPrimepodloga: z.string().optional(),
+  pomiarM2: z.number().optional(),
+  procentDocinki: z.number().min(5).max(20).optional(),
+  terminMontazu: z.string().optional(),
+  terminDostawy: z.string().optional(),
+  dniPrzedMontazem: z.number().min(1).optional(),
+  warunekWnoszenia: z.string().optional(),
+  // Pola do śledzenia zmian
+  czyZmianaAdresu: z.boolean().optional(),
+  czyZmianaModelu: z.boolean().optional(),
+  nowyModelPanela: z.string().optional(),
+  historiaZmianModelu: z.string().optional(),
+  notatkiMontazysty: z.string().optional(),
+  // Pola potwierdzenia
+  potwierdzaAdres: z.boolean().optional(),
+  potwierdzaPanel: z.boolean().optional(),
 });
 
 export async function PUT(
@@ -17,7 +37,7 @@ export async function PUT(
 ) {
   try {
     const user = await currentUser();
-    if (!user || user.role !== "ADMIN") {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -29,15 +49,56 @@ export async function PUT(
     const body = await req.json();
     const validated = updateMontazSchema.parse(body);
 
+    // Sprawdź czy montaż istnieje i czy użytkownik ma uprawnienia
+    const existingMontaz = await prisma.montaz.findUnique({
+      where: { id },
+    });
+
+    if (!existingMontaz) {
+      return NextResponse.json({ error: "Montaż not found" }, { status: 404 });
+    }
+
+    // ADMIN może edytować wszystko, MONTAZYSTA tylko swoje montaże
+    if (user.role === "MONTAZYSTA" && existingMontaz.montazystaId !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Przygotuj dane do aktualizacji
+    const updateData: any = {
+      klientImie: validated.klientImie,
+      klientNazwisko: validated.klientNazwisko,
+      uwagi: validated.uwagi,
+      // Nowe pola
+      czyKlientPotwierdza: validated.czyKlientPotwierdza,
+      czyZmiana: validated.czyZmiana,
+      adres: validated.adres,
+      notatkaPrimepodloga: validated.notatkaPrimepodloga,
+      pomiarM2: validated.pomiarM2,
+      procentDocinki: validated.procentDocinki,
+      terminMontazu: validated.terminMontazu ? new Date(validated.terminMontazu) : undefined,
+      terminDostawy: validated.terminDostawy ? new Date(validated.terminDostawy) : undefined,
+      dniPrzedMontazem: validated.dniPrzedMontazem,
+      warunekWnoszenia: validated.warunekWnoszenia,
+      // Pola do śledzenia zmian
+      czyZmianaAdresu: validated.czyZmianaAdresu,
+      czyZmianaModelu: validated.czyZmianaModelu,
+      nowyModelPanela: validated.nowyModelPanela,
+      historiaZmianModelu: validated.historiaZmianModelu,
+      notatkiMontazysty: validated.notatkiMontazysty,
+      // Pola potwierdzenia
+      potwierdzaAdres: validated.potwierdzaAdres,
+      potwierdzaPanel: validated.potwierdzaPanel,
+    };
+
+    // ADMIN może zmieniać montażystę i status
+    if (user.role === "ADMIN") {
+      if (validated.montazystaId) updateData.montazystaId = validated.montazystaId;
+      if (validated.status) updateData.status = validated.status;
+    }
+
     const updatedMontaz = await prisma.montaz.update({
       where: { id },
-      data: {
-        klientImie: validated.klientImie,
-        klientNazwisko: validated.klientNazwisko,
-        montazystaId: validated.montazystaId,
-        status: validated.status,
-        uwagi: validated.uwagi,
-      },
+      data: updateData,
       include: {
         montazysta: {
           select: {
@@ -57,7 +118,7 @@ export async function PUT(
       );
     }
 
-    if (error?.code === "P2025") {
+    if ((error as any)?.code === "P2025") {
       return NextResponse.json(
         { error: "Montaż not found" },
         { status: 404 }
@@ -93,7 +154,7 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    if (error?.code === "P2025") {
+    if ((error as any)?.code === "P2025") {
       return NextResponse.json(
         { error: "Montaż not found" },
         { status: 404 }
