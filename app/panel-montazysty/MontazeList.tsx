@@ -68,15 +68,17 @@ export function MontazeList({ initialMontaze }: MontazeListProps) {
       <div className="md:hidden space-y-3">
         <h2 className="text-lg font-semibold">Moje montaże</h2>
         {montaze.map((montaz) => (
-          <Card key={montaz.id}>
+          <Card 
+            key={montaz.id} 
+            className="cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => handleClientClick(montaz)}
+            title="Kliknij aby zobaczyć szczegóły klienta"
+          >
             <CardContent className="p-4">
               <div className="space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 
-                      className="font-medium text-sm cursor-pointer hover:text-primary transition-colors"
-                      onClick={() => handleClientClick(montaz)}
-                    >
+                    <h3 className="font-medium text-sm">
                       {montaz.klientImie} {montaz.klientNazwisko}
                     </h3>
                     <p className="text-xs text-muted-foreground">
@@ -87,7 +89,7 @@ export function MontazeList({ initialMontaze }: MontazeListProps) {
                     {statusLabel[montaz.status]}
                   </Badge>
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <AddPomiarDialog 
                     montaz={montaz}
                     onPomiarAdded={handlePomiarAdded} 
@@ -129,12 +131,14 @@ export function MontazeList({ initialMontaze }: MontazeListProps) {
                 </TableHeader>
                 <TableBody>
                   {montaze.map((montaz) => (
-                    <TableRow key={montaz.id}>
+                    <TableRow 
+                      key={montaz.id} 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleClientClick(montaz)}
+                      title="Kliknij aby zobaczyć szczegóły klienta"
+                    >
                       <TableCell>
-                        <span 
-                          className="cursor-pointer hover:text-primary transition-colors font-medium"
-                          onClick={() => handleClientClick(montaz)}
-                        >
+                        <span className="font-medium">
                           {montaz.klientImie} {montaz.klientNazwisko}
                         </span>
                       </TableCell>
@@ -149,7 +153,7 @@ export function MontazeList({ initialMontaze }: MontazeListProps) {
                       <TableCell>
                         {(montaz as any).notatkiMontazysty || montaz.uwagi || '-'}
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <AddPomiarDialog 
                           montaz={montaz}
                           onPomiarAdded={handlePomiarAdded} 
