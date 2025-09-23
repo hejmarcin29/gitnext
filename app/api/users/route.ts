@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 import { currentUser } from "@/lib/currentUser";
 import { createUserSchema } from "@/lib/validation";
 
@@ -45,28 +47,20 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validated = createUserSchema.parse(body);
 
-    // Zwykłe hasło bez hasha
-    const passwordHash = validated.password;
+  // Hash hasła
+  const passwordHash = await bcrypt.hash(validated.password, 10);
 
     const newUser = await prisma.user.create({
       data: {
         email: validated.email,
         passwordHash,
         role: validated.role,
-        telefon: validated.telefon,
-        adres: validated.adres,
-        modelPanela: validated.modelPanela,
-        notatka: validated.notatka,
       },
       select: {
         id: true,
         email: true,
         role: true,
         isActive: true,
-        telefon: true,
-        adres: true,
-        modelPanela: true,
-        notatka: true,
       },
     });
 
@@ -80,7 +74,7 @@ export async function POST(req: Request) {
     }
 
     // Obsługa duplikatu email
-    if ((error as any)?.code === "P2002") {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
         { status: 400 }

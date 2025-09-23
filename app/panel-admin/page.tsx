@@ -3,7 +3,6 @@ import { getSession } from "@/lib/session";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MobileNavigation } from "@/components/ui/mobile-navigation";
 import { UsersTab } from "./tabs/UsersTab";
-import { MontazeTab } from "./tabs/MontazeTab";
 
 export default async function Page() {
   await requireAdmin();
@@ -21,15 +20,10 @@ export default async function Page() {
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-none">
           <TabsTrigger value="users" className="text-sm">Użytkownicy</TabsTrigger>
-          <TabsTrigger value="montaze" className="text-sm">Montaże</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
           <UsersTab />
-        </TabsContent>
-
-        <TabsContent value="montaze" className="space-y-4">
-          <MontazeTab />
         </TabsContent>
       </Tabs>
     </main>

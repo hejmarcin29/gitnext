@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 import { currentUser } from "@/lib/currentUser";
 
 const updateUserSchema = z.object({
@@ -36,7 +38,7 @@ export async function PUT(
 
     // Jeśli podano hasło, zahaszuj je
     if (validated.password) {
-      updateData.passwordHash = validated.password; // Zwykłe hasło bez hasha
+      updateData.passwordHash = await bcrypt.hash(validated.password, 10);
     }
 
     const updatedUser = await prisma.user.update({
@@ -59,20 +61,18 @@ export async function PUT(
       );
     }
 
-    if (error && typeof error === 'object' && 'code' in error) {
-      if (error.code === "P2002") {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
         return NextResponse.json(
           { error: "Email already exists" },
           { status: 400 }
         );
-      }
+    }
 
-      if (error.code === "P2025") {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
         return NextResponse.json(
           { error: "User not found" },
           { status: 404 }
         );
-      }
     }
 
     console.error("[PUT] /api/users/[id] error:", error);

@@ -6,5 +6,6 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const s = await getSession();
   if (!s) redirect("/login");
-  redirect(s.user.role === "ADMIN" ? "/panel-admin" : "/panel-montazysty");
+  // Panel montażysty został trwale wyłączony
+  redirect(s.user.role === "ADMIN" ? "/panel-admin" : "/login");
 }

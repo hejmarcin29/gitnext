@@ -11,5 +11,6 @@ export default async function Home() {
     redirect("/login");
   }
 
-  redirect(user.role === "ADMIN" ? "/panel-admin" : "/panel-montazysty");
+  // Panel montażysty został trwale wyłączony – użytkownicy nie-admin trafiają na stronę logowania
+  redirect(user.role === "ADMIN" ? "/panel-admin" : "/login");
 }
