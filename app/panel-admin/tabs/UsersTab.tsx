@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { UserTable } from '@/components/users/UserTable';
 import { AddUserDialog } from '@/components/users/AddUserDialog';
 import { EditUserDialog } from '@/components/users/EditUserDialog';
 import type { User } from '@prisma/client';
 
 export function UsersTab() {
-  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

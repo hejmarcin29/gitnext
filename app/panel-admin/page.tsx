@@ -5,10 +5,11 @@ import { MobileNavigation } from "@/components/ui/mobile-navigation";
 import { UsersTab } from "./tabs/UsersTab";
 import { ClientsTab } from "./tabs/ClientsTab";
 
-export default async function Page({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
+export default async function Page({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   await requireAdmin();
   const session = await getSession();
-  const tab = typeof searchParams?.tab === 'string' ? searchParams!.tab : 'users';
+  const sp = searchParams ? await searchParams : undefined;
+  const tab = typeof sp?.tab === 'string' ? sp.tab : 'users';
   
   return (
     <main className="p-4 sm:p-6">

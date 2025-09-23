@@ -30,8 +30,8 @@ export async function PUT(
     const body = await req.json();
     const validated = updateUserSchema.parse(body);
 
-    // Przygotuj dane do aktualizacji
-    const updateData: any = {
+    // Przygotuj dane do aktualizacji z precyzyjnym typem
+    const updateData: { email: string; role: "ADMIN" | "MONTAZYSTA"; passwordHash?: string } = {
       email: validated.email,
       role: validated.role,
     };

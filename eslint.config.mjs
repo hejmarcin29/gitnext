@@ -18,6 +18,13 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Ignore archived/disabled modules and tooling scripts
+      "components/montaze/**",
+      "components/pomiary/**",
+      "app/panel-montazysty/**",
+      "app/panel-admin/tabs/MontazeTab.tsx",
+      "scripts/**",
+      "prisma/seed.js",
     ],
   },
 ];
