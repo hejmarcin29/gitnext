@@ -35,6 +35,16 @@ export const createPomiarSchema = z.object({
   uwagi: z.string().optional(),
 });
 
+// Schema dla tworzenia klienta (wszystkie pola wymagane)
+export const createKlientSchema = z.object({
+  imie: z.string().min(1, "Imię jest wymagane").trim(),
+  nazwisko: z.string().min(1, "Nazwisko jest wymagane").trim(),
+  telefon: z.string().min(1, "Telefon jest wymagany").trim(),
+  miasto: z.string().min(1, "Miasto jest wymagane").trim(),
+  adresFaktury: z.string().min(1, "Adres faktury jest wymagany").trim(),
+  rodzajWspolpracy: z.enum(["DOSTAWA", "MONTAZ"]),
+});
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);

@@ -3,10 +3,12 @@ import { getSession } from "@/lib/session";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MobileNavigation } from "@/components/ui/mobile-navigation";
 import { UsersTab } from "./tabs/UsersTab";
+import { ClientsTab } from "./tabs/ClientsTab";
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
   await requireAdmin();
   const session = await getSession();
+  const tab = typeof searchParams?.tab === 'string' ? searchParams!.tab : 'users';
   
   return (
     <main className="p-4 sm:p-6">
@@ -17,13 +19,17 @@ export default async function Page() {
       </div>
 
       {/* Responsive tabs */}
-      <Tabs defaultValue="users" className="space-y-4">
+  <Tabs defaultValue={tab === 'clients' ? 'clients' : 'users'} className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-none">
           <TabsTrigger value="users" className="text-sm">Użytkownicy</TabsTrigger>
+          <TabsTrigger value="clients" className="text-sm">Klienci</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
           <UsersTab />
+        </TabsContent>
+        <TabsContent value="clients" className="space-y-4">
+          <ClientsTab />
         </TabsContent>
       </Tabs>
     </main>
